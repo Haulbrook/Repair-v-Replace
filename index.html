@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Make smarter decisions between repair and replacement with our comprehensive analysis tool">
+    <title>Repair vs Replace | Smart Decision Platform</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg class="sun-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg class="moon-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+    </button>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="#" class="logo">
+                    <svg class="logo-icon" width="40" height="40" viewBox="0 0 40 40" fill="none">
+                        <rect width="40" height="40" rx="8" fill="url(#gradient1)"/>
+                        <path d="M12 20L18 26L28 14" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="gradient1" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#667eea"/>
+                                <stop offset="100%" stop-color="#764ba2"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">Repair<span class="logo-separator">vs</span>Replace</span>
+                </a>
+
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <ul class="nav-links">
+                    <li><a href="#features" class="nav-link">Features</a></li>
+                    <li><a href="#calculator" class="nav-link">Calculator</a></li>
+                    <li><a href="#insights" class="nav-link">Insights</a></li>
+                    <li><a href="#testimonials" class="nav-link">Reviews</a></li>
+                    <li><a href="#pricing" class="nav-link">Pricing</a></li>
+                    <li><a href="#contact" class="btn-nav">Get Started</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-background">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="gradient-orb orb-3"></div>
+            <div class="grid-pattern"></div>
+        </div>
+
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge" data-aos="fade-up">
+                    <span class="badge-dot"></span>
+                    <span>Trusted by 50,000+ decision makers</span>
+                </div>
+
+                <h1 class="hero-title" data-aos="fade-up" data-aos-delay="100">
+                    Make Smarter
+                    <span class="gradient-text">Repair vs Replace</span>
+                    Decisions
+                </h1>
+
+                <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200">
+                    Leverage AI-powered analytics and comprehensive cost modeling to determine whether repairing or replacing your assets is the optimal financial decision.
+                </p>
+
+                <div class="hero-cta" data-aos="fade-up" data-aos-delay="300">
+                    <a href="#calculator" class="btn btn-primary btn-large">
+                        <span>Start Free Analysis</span>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                    <a href="#demo" class="btn btn-secondary btn-large">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1 14.5v-9l6 4.5-6 4.5z"/>
+                        </svg>
+                        <span>Watch Demo</span>
+                    </a>
+                </div>
+
+                <div class="hero-stats" data-aos="fade-up" data-aos-delay="400">
+                    <div class="stat-item">
+                        <div class="stat-number">$2.4M+</div>
+                        <div class="stat-label">Saved in costs</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-number">98%</div>
+                        <div class="stat-label">Accuracy rate</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-number">2 min</div>
+                        <div class="stat-label">Average analysis</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual" data-aos="fade-left" data-aos-delay="500">
+                <div class="dashboard-preview">
+                    <div class="dashboard-header">
+                        <div class="dashboard-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <div class="dashboard-title">Decision Analysis</div>
+                    </div>
+                    <div class="dashboard-content">
+                        <div class="chart-container">
+                            <svg class="chart" viewBox="0 0 300 200">
+                                <defs>
+                                    <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#667eea" stop-opacity="0.3"/>
+                                        <stop offset="100%" stop-color="#667eea" stop-opacity="0"/>
+                                    </linearGradient>
+                                </defs>
+                                <path class="chart-line" d="M0,150 Q50,120 75,100 T150,80 T225,60 T300,40" stroke="#667eea" stroke-width="3" fill="none"/>
+                                <path class="chart-area" d="M0,150 Q50,120 75,100 T150,80 T225,60 T300,40 L300,200 L0,200 Z" fill="url(#chartGradient)"/>
+                            </svg>
+                        </div>
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-icon repair-icon">🔧</div>
+                                <div class="metric-info">
+                                    <div class="metric-label">Repair Cost</div>
+                                    <div class="metric-value">$3,450</div>
+                                </div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-icon replace-icon">✨</div>
+                                <div class="metric-info">
+                                    <div class="metric-label">Replace Cost</div>
+                                    <div class="metric-value">$8,900</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-tag">Features</span>
+                <h2 class="section-title">Everything you need to make informed decisions</h2>
+                <p class="section-subtitle">Comprehensive tools and insights powered by advanced analytics</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon gradient-purple">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="16" cy="16" r="12"/>
+                            <path d="M16 8v8l4 4"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Real-Time Analysis</h3>
+                    <p class="feature-description">Get instant cost comparisons and projections based on current market data and historical trends.</p>
+                    <ul class="feature-list">
+                        <li>Live market pricing</li>
+                        <li>Instant calculations</li>
+                        <li>Dynamic updates</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon gradient-blue">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 28h24M4 22h24M4 16h24M4 10h24"/>
+                            <rect x="8" y="4" width="16" height="4" rx="1"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Comprehensive Reporting</h3>
+                    <p class="feature-description">Generate detailed reports with visual breakdowns, cost projections, and ROI analysis.</p>
+                    <ul class="feature-list">
+                        <li>PDF exports</li>
+                        <li>Visual charts</li>
+                        <li>Shareable links</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon gradient-green">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 4v24M8 8l8-4 8 4M8 24l8 4 8-4M8 8v16M24 8v16"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">AI-Powered Insights</h3>
+                    <p class="feature-description">Machine learning algorithms analyze thousands of data points to provide accurate recommendations.</p>
+                    <ul class="feature-list">
+                        <li>Predictive modeling</li>
+                        <li>Pattern recognition</li>
+                        <li>Smart suggestions</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon gradient-orange">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="4" y="4" width="24" height="24" rx="2"/>
+                            <path d="M4 12h24M12 4v24"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Custom Scenarios</h3>
+                    <p class="feature-description">Create multiple scenarios with different variables to compare outcomes side by side.</p>
+                    <ul class="feature-list">
+                        <li>Multi-scenario planning</li>
+                        <li>Variable adjustments</li>
+                        <li>Comparison views</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-icon gradient-pink">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 4L4 9l12 5 12-5-12-5z"/>
+                            <path d="M4 18l12 5 12-5M4 23l12 5 12-5"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Historical Tracking</h3>
+                    <p class="feature-description">Track all your decisions over time and analyze patterns in your repair vs replace choices.</p>
+                    <ul class="feature-list">
+                        <li>Decision history</li>
+                        <li>Trend analysis</li>
+                        <li>Performance metrics</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="600">
+                    <div class="feature-icon gradient-teal">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="16" cy="16" r="12"/>
+                            <path d="M16 12v4l3 3"/>
+                            <path d="M12 8a8 8 0 018 0"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Team Collaboration</h3>
+                    <p class="feature-description">Share analyses with team members, gather input, and make collaborative decisions.</p>
+                    <ul class="feature-list">
+                        <li>Real-time collaboration</li>
+                        <li>Comments & feedback</li>
+                        <li>Role-based access</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculator Section -->
+    <section id="calculator" class="calculator-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-tag">Interactive Tool</span>
+                <h2 class="section-title">Try Our Decision Calculator</h2>
+                <p class="section-subtitle">Input your data and get instant recommendations</p>
+            </div>
+
+            <div class="calculator-container" data-aos="fade-up" data-aos-delay="200">
+                <div class="calculator-form">
+                    <div class="form-header">
+                        <h3>Asset Information</h3>
+                        <p>Provide details about your asset to get started</p>
+                    </div>
+
+                    <form id="decisionForm">
+                        <div class="form-group">
+                            <label for="assetType">Asset Type</label>
+                            <select id="assetType" class="form-control">
+                                <option value="">Select asset type</option>
+                                <option value="appliance">Home Appliance</option>
+                                <option value="vehicle">Vehicle</option>
+                                <option value="equipment">Equipment</option>
+                                <option value="property">Property Component</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="assetAge">Asset Age (years)</label>
+                                <input type="number" id="assetAge" class="form-control" placeholder="e.g., 5" min="0" step="0.5">
+                            </div>
+                            <div class="form-group">
+                                <label for="originalCost">Original Cost ($)</label>
+                                <input type="number" id="originalCost" class="form-control" placeholder="e.g., 1200" min="0">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="repairCost">Estimated Repair Cost ($)</label>
+                                <input type="number" id="repairCost" class="form-control" placeholder="e.g., 450" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="replaceCost">Replacement Cost ($)</label>
+                                <input type="number" id="replaceCost" class="form-control" placeholder="e.g., 1500" min="0">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lifespan">Expected Lifespan (years)</label>
+                            <input type="number" id="lifespan" class="form-control" placeholder="e.g., 10" min="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="energyEfficiency">
+                                <span class="checkbox-custom"></span>
+                                <span>Consider energy efficiency improvements</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-large btn-full">
+                            <span>Calculate Recommendation</span>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="calculator-results" id="calculatorResults">
+                    <div class="results-placeholder">
+                        <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+                            <circle cx="60" cy="60" r="50" stroke="currentColor" stroke-width="2" opacity="0.2"/>
+                            <path d="M40 60h40M60 40v40" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <h4>Enter your data</h4>
+                        <p>Fill out the form to see your personalized recommendation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Insights Section -->
+    <section id="insights" class="insights-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-tag">Insights</span>
+                <h2 class="section-title">Data-Driven Decision Making</h2>
+                <p class="section-subtitle">Key metrics and trends from thousands of analyses</p>
+            </div>
+
+            <div class="insights-grid">
+                <div class="insight-card large" data-aos="fade-up" data-aos-delay="100">
+                    <div class="insight-header">
+                        <h3>Cost Breakdown Analysis</h3>
+                        <span class="insight-trend positive">+12% accuracy</span>
+                    </div>
+                    <div class="insight-visual">
+                        <div class="comparison-bars">
+                            <div class="bar-item">
+                                <div class="bar-label">Repair</div>
+                                <div class="bar-track">
+                                    <div class="bar-fill repair" style="width: 45%"></div>
+                                </div>
+                                <div class="bar-value">$3,450</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">Replace</div>
+                                <div class="bar-track">
+                                    <div class="bar-fill replace" style="width: 100%"></div>
+                                </div>
+                                <div class="bar-value">$8,900</div>
+                            </div>
+                            <div class="bar-item">
+                                <div class="bar-label">5-Year TCO (Repair)</div>
+                                <div class="bar-track">
+                                    <div class="bar-fill tco" style="width: 72%"></div>
+                                </div>
+                                <div class="bar-value">$6,200</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insight-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="insight-icon gradient-blue">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M26 28H6a2 2 0 01-2-2V6a2 2 0 012-2h20a2 2 0 012 2v20a2 2 0 01-2 2z"/>
+                            <path d="M4 12h24"/>
+                        </svg>
+                    </div>
+                    <h3>Average Decision Time</h3>
+                    <div class="insight-stat">2.3 min</div>
+                    <p class="insight-description">From data input to final recommendation</p>
+                </div>
+
+                <div class="insight-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="insight-icon gradient-green">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 4L4 16l12 12 12-12L16 4z"/>
+                            <path d="M16 4v24"/>
+                        </svg>
+                    </div>
+                    <h3>Success Rate</h3>
+                    <div class="insight-stat">98.2%</div>
+                    <p class="insight-description">Users satisfied with recommendations</p>
+                </div>
+
+                <div class="insight-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="insight-icon gradient-purple">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="16" cy="16" r="12"/>
+                            <path d="M16 12v8M16 8v1"/>
+                        </svg>
+                    </div>
+                    <h3>Cost Savings</h3>
+                    <div class="insight-stat">$2.4M+</div>
+                    <p class="insight-description">Total saved by our users in 2024</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-tag">Testimonials</span>
+                <h2 class="section-title">Trusted by thousands</h2>
+                <p class="section-subtitle">See what our users have to say</p>
+            </div>
+
+            <div class="testimonials-grid">
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"This tool saved us over $50,000 in the first quarter alone. The insights are incredibly accurate and the interface is intuitive."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">JD</div>
+                        <div class="author-info">
+                            <div class="author-name">John Davidson</div>
+                            <div class="author-title">Fleet Manager, LogiCorp</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"Finally, a data-driven approach to repair decisions. The ROI calculations are spot-on and have transformed our maintenance strategy."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">SM</div>
+                        <div class="author-info">
+                            <div class="author-name">Sarah Mitchell</div>
+                            <div class="author-title">Operations Director, BuildTech</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">"The comparison reports have become essential in our decision-making process. Clear, comprehensive, and always accurate."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">MR</div>
+                        <div class="author-info">
+                            <div class="author-name">Michael Rodriguez</div>
+                            <div class="author-title">Facilities Manager, TechHub</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-tag">Pricing</span>
+                <h2 class="section-title">Choose your plan</h2>
+                <p class="section-subtitle">Flexible pricing for teams of all sizes</p>
+            </div>
+
+            <div class="pricing-toggle" data-aos="fade-up" data-aos-delay="100">
+                <button class="toggle-btn active" data-period="monthly">Monthly</button>
+                <button class="toggle-btn" data-period="annual">Annual <span class="discount-badge">Save 20%</span></button>
+            </div>
+
+            <div class="pricing-grid">
+                <div class="pricing-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">Starter</h3>
+                        <p class="pricing-description">Perfect for individuals</p>
+                    </div>
+                    <div class="pricing-price">
+                        <span class="price-currency">$</span>
+                        <span class="price-amount">19</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li class="feature-included">
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1.5 14.5L4 10l1.5-1.5L8.5 11l4.5-4.5L14.5 8l-6 6.5z"/>
+                            </svg>
+                            <span>50 analyses per month</span>
+                        </li>
+                        <li class="feature-included">
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1.5 14.5L4 10l1.5-1.5L8.5 11l4.5-4.5L14.5 8l-6 6.5z"/>
+                            </svg>
+                            <span>Basic reporting</span>
+                        </li>
+                        <li class="feature-included">
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1.5 14.5L4 10l1.5-1.5L8.5 11l4.5-4.5L14.5 8l-6 6.5z"/>
+                            </svg>
+                            <span>Email support</span>
+                        </li>
+                        <li class="feature-excluded">
+                            <svg class="x-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm3.5 12L10 8.5 6.5 12 5 10.5 8.5 7 5 3.5 6.5 2 10 5.5 13.5 2l1.5 1.5L11.5 7l3.5 3.5-1.5 1.5z"/>
+                            </svg>
+                            <span>Team collaboration</span>
+                        </li>
+                    </ul>
+                    <button class="btn btn-secondary btn-full">Get Started</button>
+                </div>
+
+                <div class="pricing-card featured" data-aos="fade-up" data-aos-delay="300">
+                    <div class="popular-badge">Most Popular</div>
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">Professional</h3>
+                        <p class="pricing-description">For small teams</p>
+                    </div>
+                    <div class="pricing-price">
+                        <span class="price-currency">$</span>
+                        <span class="price-amount">49</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li class="feature-included">
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1.5 14.5L4 10l1.5-1.5L8.5 11l4.5-4.5L14.5 8l-6 6.5z"/>
+                            </svg>
+                            <span>Unlimited analyses</span>
+                        </li>
+                        <li class="feature-included">
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1.5 14.5L4 10l1.5-1.5L8.5 11l4.5-4.5L14.5 8l-6 6.5z"/>
+                            </svg>
+                            <span>Advanced reporting</span>
+                        </li>
+                        <li class="feature-included">
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1.5 14.5L4 10l1.5-1.5L8.5 11l4.5-4.5L14.5 8l-6 6.5z"/>
+                            </svg>
+                            <span>Priority support</span>
+                        </li>
+                        <li class="feature-included">
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1.5 14.5L4 10l1.5-1.5L8.5 11l4.5-4.5L14.5 8l-6 6.5z"/>
+                            </svg>
+                            <span>Up to 10 team members</span>
+                        </li>
+                        <li class="feature-included">
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1.5 14.5L4 10l1.5-1.5L8.5 11l4.5-4.5L14.5 8l-6 6.5z"/>
+                            </svg>
+                            <span>API access</span>
+                        </li>
+                    </ul>
+                    <button class="btn btn-primary btn-full">Get Started</button>
+                </div>
+
+                <div class="pricing-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">Enterprise</h3>
+                        <p class="pricing-description">For large organizations</p>
+                    </div>
+                    <div class="pricing-price">
+                        <span class="price-amount" style="font-size: 2rem;">Custom</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li class="feature-included">
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1.5 14.5L4 10l1.5-1.5L8.5 11l4.5-4.5L14.5 8l-6 6.5z"/>
+                            </svg>
+                            <span>Everything in Professional</span>
+                        </li>
+                        <li class="feature-included">
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1.5 14.5L4 10l1.5-1.5L8.5 11l4.5-4.5L14.5 8l-6 6.5z"/>
+                            </svg>
+                            <span>Unlimited team members</span>
+                        </li>
+                        <li class="feature-included">
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1.5 14.5L4 10l1.5-1.5L8.5 11l4.5-4.5L14.5 8l-6 6.5z"/>
+                            </svg>
+                            <span>Dedicated account manager</span>
+                        </li>
+                        <li class="feature-included">
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1.5 14.5L4 10l1.5-1.5L8.5 11l4.5-4.5L14.5 8l-6 6.5z"/>
+                            </svg>
+                            <span>Custom integrations</span>
+                        </li>
+                        <li class="feature-included">
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm-1.5 14.5L4 10l1.5-1.5L8.5 11l4.5-4.5L14.5 8l-6 6.5z"/>
+                            </svg>
+                            <span>SLA guarantee</span>
+                        </li>
+                    </ul>
+                    <button class="btn btn-secondary btn-full">Contact Sales</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-card" data-aos="fade-up">
+                <div class="cta-content">
+                    <h2 class="cta-title">Ready to make smarter decisions?</h2>
+                    <p class="cta-subtitle">Join thousands of professionals who trust our platform for critical repair vs replace decisions.</p>
+                    <div class="cta-buttons">
+                        <a href="#contact" class="btn btn-primary btn-large">
+                            <span>Start Free Trial</span>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                        <a href="#contact" class="btn btn-secondary btn-large">Schedule Demo</a>
+                    </div>
+                </div>
+                <div class="cta-visual">
+                    <div class="floating-card card-1">
+                        <div class="card-icon">💰</div>
+                        <div class="card-text">$2.4M Saved</div>
+                    </div>
+                    <div class="floating-card card-2">
+                        <div class="card-icon">⚡</div>
+                        <div class="card-text">2 min avg</div>
+                    </div>
+                    <div class="floating-card card-3">
+                        <div class="card-icon">✓</div>
+                        <div class="card-text">98% Success</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <a href="#" class="footer-logo">
+                        <svg class="logo-icon" width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <rect width="40" height="40" rx="8" fill="url(#gradient2)"/>
+                            <path d="M12 20L18 26L28 14" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            <defs>
+                                <linearGradient id="gradient2" x1="0" y1="0" x2="40" y2="40">
+                                    <stop offset="0%" stop-color="#667eea"/>
+                                    <stop offset="100%" stop-color="#764ba2"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <span class="logo-text">Repair<span class="logo-separator">vs</span>Replace</span>
+                    </a>
+                    <p class="footer-description">Make data-driven decisions with confidence. Trusted by thousands of professionals worldwide.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Twitter">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="LinkedIn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+                                <circle cx="4" cy="4" r="2"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="GitHub">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-heading">Product</h4>
+                    <ul class="footer-links">
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#calculator">Calculator</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#testimonials">Testimonials</a></li>
+                        <li><a href="#">API Documentation</a></li>
+                        <li><a href="#">Integrations</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-heading">Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press Kit</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-heading">Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">GDPR</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-heading">Newsletter</h4>
+                    <p class="newsletter-text">Stay updated with our latest features and releases.</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Enter your email" class="newsletter-input" required>
+                        <button type="submit" class="newsletter-button">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 Repair vs Replace. All rights reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Status</a>
+                    <span>•</span>
+                    <a href="#">Changelog</a>
+                    <span>•</span>
+                    <a href="#">Support</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/main.js"></script>
+</body>
+</html>
