@@ -390,13 +390,23 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Cost calculation listeners
-  const costInputs = ['partCost', 'laborHours', 'laborRate'];
+  const costInputs = ['partCost', 'laborHours'];
   costInputs.forEach(id => {
     const input = document.getElementById(id);
     if (input) {
       input.addEventListener('input', updateCostPreview);
     }
   });
+
+  // Labor rate type dropdown handler
+  const laborRateTypeSelect = document.getElementById('laborRateType');
+  if (laborRateTypeSelect) {
+    laborRateTypeSelect.addEventListener('change', function() {
+      const laborRateInput = document.getElementById('laborRate');
+      laborRateInput.value = this.value || 0;
+      updateCostPreview();
+    });
+  }
 
   // Set today's date as default
   const dateInput = document.getElementById('repairDate');
@@ -454,13 +464,18 @@ function submitRepair() {
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<span>Adding Repair...</span>';
 
+  const laborRateType = document.getElementById('laborRateType');
+  const laborRateValue = laborRateType.value;
+  const laborRateLabel = laborRateType.options[laborRateType.selectedIndex].text;
+
   const repairData = {
     assetId: document.getElementById('assetSelect').value,
     repairDate: document.getElementById('repairDate').value,
     partName: document.getElementById('partName').value,
     partCost: document.getElementById('partCost').value,
     laborHours: document.getElementById('laborHours').value,
-    laborRate: document.getElementById('laborRate').value,
+    laborRate: laborRateValue,
+    laborRateType: laborRateLabel,
     notes: document.getElementById('repairNotes').value
   };
 
@@ -503,6 +518,10 @@ function resetRepairForm() {
   document.getElementById('repairSuccessMessage').style.display = 'none';
   document.getElementById('assetInfoDisplay').style.display = 'none';
   document.getElementById('costPreview').style.display = 'none';
+
+  // Reset labor rate
+  document.getElementById('laborRate').value = 0;
+  document.getElementById('laborRateType').value = '';
 
   // Set today's date
   const dateInput = document.getElementById('repairDate');

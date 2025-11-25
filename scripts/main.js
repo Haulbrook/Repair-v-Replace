@@ -184,17 +184,53 @@ class Calculator {
   init() {
     if (this.form && this.resultsContainer) {
       this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+
+      // Add listeners for labor cost calculation
+      const partsCost = document.getElementById('partsCost');
+      const laborHours = document.getElementById('laborHours');
+      const laborRateType = document.getElementById('laborRateType');
+
+      if (partsCost) partsCost.addEventListener('input', () => this.updateRepairCost());
+      if (laborHours) laborHours.addEventListener('input', () => this.updateRepairCost());
+      if (laborRateType) laborRateType.addEventListener('change', () => this.updateRepairCost());
+    }
+  }
+
+  updateRepairCost() {
+    const partsCost = parseFloat(document.getElementById('partsCost').value) || 0;
+    const laborHours = parseFloat(document.getElementById('laborHours').value) || 0;
+    const laborRate = parseFloat(document.getElementById('laborRateType').value) || 80;
+
+    const laborCost = laborHours * laborRate;
+    const totalRepairCost = partsCost + laborCost;
+
+    const repairCostInput = document.getElementById('repairCost');
+    if (repairCostInput) {
+      repairCostInput.value = totalRepairCost > 0 ? totalRepairCost.toFixed(2) : '';
     }
   }
 
   handleSubmit(e) {
     e.preventDefault();
 
+    // Get labor cost details
+    const partsCost = parseFloat(document.getElementById('partsCost').value) || 0;
+    const laborHours = parseFloat(document.getElementById('laborHours').value) || 0;
+    const laborRateSelect = document.getElementById('laborRateType');
+    const laborRate = parseFloat(laborRateSelect.value) || 80;
+    const laborRateLabel = laborRateSelect.options[laborRateSelect.selectedIndex].text;
+    const laborCost = laborHours * laborRate;
+
     // Get form values
     const formData = {
       assetType: document.getElementById('assetType').value,
       assetAge: parseFloat(document.getElementById('assetAge').value) || 0,
       originalCost: parseFloat(document.getElementById('originalCost').value) || 0,
+      partsCost: partsCost,
+      laborHours: laborHours,
+      laborRate: laborRate,
+      laborRateLabel: laborRateLabel,
+      laborCost: laborCost,
       repairCost: parseFloat(document.getElementById('repairCost').value) || 0,
       replaceCost: parseFloat(document.getElementById('replaceCost').value) || 0,
       lifespan: parseFloat(document.getElementById('lifespan').value) || 10,
@@ -273,6 +309,11 @@ class Calculator {
     return {
       recommendation,
       confidence: Math.round(confidence),
+      partsCost: data.partsCost || 0,
+      laborHours: data.laborHours || 0,
+      laborRate: data.laborRate || 80,
+      laborRateLabel: data.laborRateLabel || 'Day Rate - $80/hour',
+      laborCost: data.laborCost || 0,
       repairCost,
       replaceCost,
       currentValue: Math.round(currentValue),
@@ -304,15 +345,42 @@ class Calculator {
           </div>
         </div>
 
-        <div class="result-stats" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-4); margin-bottom: var(--spacing-8);">
+        <div class="result-stats" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-4); margin-bottom: var(--spacing-6);">
           <div class="stat-box" style="padding: var(--spacing-4); background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); text-align: center;">
-            <div style="font-size: var(--font-size-sm); color: var(--text-tertiary); margin-bottom: var(--spacing-2);">Repair Cost</div>
+            <div style="font-size: var(--font-size-sm); color: var(--text-tertiary); margin-bottom: var(--spacing-2);">Total Repair Cost</div>
             <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary);">$${result.repairCost.toLocaleString()}</div>
           </div>
           <div class="stat-box" style="padding: var(--spacing-4); background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); text-align: center;">
             <div style="font-size: var(--font-size-sm); color: var(--text-tertiary); margin-bottom: var(--spacing-2);">Replace Cost</div>
             <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary);">$${result.replaceCost.toLocaleString()}</div>
           </div>
+        </div>
+
+        ${result.laborCost > 0 ? `
+        <div class="labor-breakdown" style="padding: var(--spacing-4); background: var(--bg-tertiary); border-radius: var(--radius-lg); margin-bottom: var(--spacing-6);">
+          <h4 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--text-secondary); margin-bottom: var(--spacing-3);">Labor Cost Breakdown</h4>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-3);">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-tertiary);">Parts Cost:</span>
+              <span style="font-weight: var(--font-weight-medium); color: var(--text-primary);">$${result.partsCost.toLocaleString()}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-tertiary);">Labor Hours:</span>
+              <span style="font-weight: var(--font-weight-medium); color: var(--text-primary);">${result.laborHours} hrs</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-tertiary);">Rate Type:</span>
+              <span style="font-weight: var(--font-weight-medium); color: var(--text-primary);">${result.laborRateLabel}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-tertiary);">Labor Cost:</span>
+              <span style="font-weight: var(--font-weight-medium); color: var(--text-primary);">$${result.laborCost.toLocaleString()}</span>
+            </div>
+          </div>
+        </div>
+        ` : ''}
+
+        <div class="result-stats" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-4); margin-bottom: var(--spacing-8);">
           <div class="stat-box" style="padding: var(--spacing-4); background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); text-align: center;">
             <div style="font-size: var(--font-size-sm); color: var(--text-tertiary); margin-bottom: var(--spacing-2);">5-Year TCO (Repair)</div>
             <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary);">$${result.repairTCO.toLocaleString()}</div>
