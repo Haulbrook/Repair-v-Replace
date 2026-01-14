@@ -1,0 +1,641 @@
+<!-- Replace V Repair-->
+<!--  index.html -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="https://www.gstatic.com/images/ico
+  ns/material/system/1x/build_black_24dp.png">
+  <title>Asset Management System</title>
+<!-- Apple Touch Icons for iOS -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- Standard favicon for browser tabs -->
+<link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+
+<!-- For better appearance on iOS when added to home screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Crew Schedule">
+
+<!-- For Android and other mobile browsers -->
+<link rel="icon" type="image/png" sizes="512x512" href="web-app-manifest-512x512.png">
+<!-- General mobile viewport settings -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- Optional: Add a fallback for very old browsers -->
+<link rel="shortcut icon" href="favicon-96x96.png">
+  <?!= include('styles'); ?>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <h1>Asset Management System</h1>
+      <p>Fleet Maintenance & Replacement Decision Tool</p>
+    </header>
+    
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showTab('dashboard')">Dashboard</button>
+      <button class="nav-tab" onclick="showTab('assets')">Assets</button>
+      <button class="nav-tab" onclick="showTab('repairs')">Add Repair</button>
+      <button class="nav-tab" onclick="showTab('history')">Repair History</button>
+    </div>
+    
+    <!-- Dashboard Tab -->
+    <div id="dashboard" class="tab-content active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="totalAssets">-</div>
+          <div class="stat-label">Total Assets</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-value" id="needReplacement">-</div>
+          <div class="stat-label">Need Replacement</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-value" id="warnings">-</div>
+          <div class="stat-label">Warnings</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-value" id="good">-</div>
+          <div class="stat-label">Good Status</div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>Top Problem Assets</h2>
+        <div id="topProblems">Loading...</div>
+      </div>
+      
+      <div class="card">
+        <h2>Cost Summary</h2>
+        <div id="costSummary">
+          <p>Total Repair Costs: <span id="totalRepairCost">$0</span></p>
+          <p>Average Repair Cost: <span id="avgRepairCost">$0</span></p>
+          <p>Total Repairs Logged: <span id="repairCount">0</span></p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Assets Tab -->
+    <div id="assets" class="tab-content">
+      <div class="card">
+        <h2>All Assets</h2>
+        <div class="table-container">
+          <table id="assetsTable">
+            <thead>
+              <tr>
+                <th>Asset ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Replacement Cost</th>
+                <th>Total Repairs</th>
+                <th>% of Replacement</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="assetsTableBody">
+              <tr><td colspan="7">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Add Repair Tab -->
+    <div id="repairs" class="tab-content">
+      <div class="card">
+        <h2>Add New Repair</h2>
+        <form id="repairForm" onsubmit="submitRepair(event)">
+          <div class="form-group">
+            <label>Asset:</label>
+            <select id="assetId" required>
+              <option value="">Select an asset...</option>
+            </select>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Repair Date:</label>
+              <input type="date" id="repairDate" required>
+            </div>
+            <div class="form-group">
+              <label>Part Name:</label>
+              <input type="text" id="partName" placeholder="e.g., Brake Pads" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Part Cost ($):</label>
+              <input type="number" id="partCost" step="0.01" placeholder="250.00" required>
+            </div>
+            <div class="form-group">
+              <label>Labor Hours:</label>
+              <input type="number" id="laborHours" step="0.5" placeholder="3.5" required>
+            </div>
+            <div class="form-group">
+              <label>Labor Rate ($/hr):</label>
+              <select id="laborRate" required>
+                <option value="80">Standard - $80/hr</option>
+                <option value="120">Senior - $120/hr</option>
+                <option value="150">Emergency - $150/hr</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Notes:</label>
+            <textarea id="notes" rows="3" placeholder="Optional notes..."></textarea>
+          </div>
+          
+          <div class="form-summary">
+            <h3>Cost Summary:</h3>
+            <p>Part Cost: $<span id="summaryPart">0.00</span></p>
+            <p>Labor Cost: $<span id="summaryLabor">0.00</span></p>
+            <p><strong>Total: $<span id="summaryTotal">0.00</span></strong></p>
+          </div>
+          
+          <button type="submit" class="btn-primary">Add Repair</button>
+        </form>
+        <div id="repairMessage"></div>
+      </div>
+    </div>
+    
+    <!-- Repair History Tab -->
+    <div id="history" class="tab-content">
+      <div class="card">
+        <h2>Repair History</h2>
+        <div class="filter-bar">
+          <select id="historyFilter" onchange="filterHistory()">
+            <option value="">All Assets</option>
+          </select>
+        </div>
+        <div class="table-container">
+          <table id="historyTable">
+            <thead>
+              <tr>
+                <th>Asset</th>
+                <th>Date</th>
+                <th>Part</th>
+                <th>Part Cost</th>
+                <th>Labor</th>
+                <th>Total Cost</th>
+                <th>Running Total</th>
+                <th>% of Replacement</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody">
+              <tr><td colspan="8">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Global variables
+    let allAssets = [];
+    let allRepairs = [];
+    
+    // Initialize app
+    window.onload = function() {
+      loadDashboard();
+      loadAssets();
+      loadRepairs();
+      setupFormListeners();
+      
+      // Set today's date as default
+      document.getElementById('repairDate').valueAsDate = new Date();
+    };
+    
+    // Tab switching
+    function showTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+      
+      // Refresh data if needed
+      if (tabName === 'dashboard') loadDashboard();
+      if (tabName === 'assets') loadAssets();
+      if (tabName === 'history') loadRepairs();
+    }
+    
+    // Load dashboard data
+    function loadDashboard() {
+      google.script.run.withSuccessHandler(function(stats) {
+        document.getElementById('totalAssets').textContent = stats.totalAssets || 0;
+        document.getElementById('needReplacement').textContent = stats.needReplacement || 0;
+        document.getElementById('warnings').textContent = stats.warnings || 0;
+        document.getElementById('good').textContent = stats.good || 0;
+        document.getElementById('totalRepairCost').textContent = '$' + (stats.totalRepairCost || 0).toFixed(2);
+        document.getElementById('avgRepairCost').textContent = '$' + (stats.averageRepairCost || 0).toFixed(2);
+        document.getElementById('repairCount').textContent = stats.repairCount || 0;
+        
+        // Top problems
+        let problemsHtml = '<div class="problem-list">';
+        if (stats.topProblems && stats.topProblems.length > 0) {
+          stats.topProblems.forEach((asset, index) => {
+            const statusClass = asset.status.includes('REPLACE') ? 'danger' : 
+                               asset.status.includes('WARNING') ? 'warning' : 'success';
+            problemsHtml += `
+              <div class="problem-item ${statusClass}">
+                <span class="rank">#${index + 1}</span>
+                <span class="asset-name">${asset.name}</span>
+                <span class="repair-amount">$${asset.totalRepairs.toFixed(2)}</span>
+                <span class="status-badge ${statusClass}">${asset.status}</span>
+              </div>
+            `;
+          });
+        } else {
+          problemsHtml += '<p>No repairs logged yet</p>';
+        }
+        problemsHtml += '</div>';
+        document.getElementById('topProblems').innerHTML = problemsHtml;
+      }).getDashboardStats();
+    }
+    
+    // Load assets
+    // Replace the loadAssets function in your index.html with this safer version
+// Replace the loadAssets function in your index.html with this safer version
+function loadAssets() {
+  console.log('Loading assets...');
+  google.script.run
+    .withSuccessHandler(function(assets) {
+      console.log('Raw assets received:', assets);
+      console.log('Type of assets:', typeof assets);
+      console.log('Is array?:', Array.isArray(assets));
+      
+      // Ensure we have an array to work with
+      if (!assets) {
+        console.warn('Assets is null or undefined, using empty array');
+        assets = [];
+      } else if (!Array.isArray(assets)) {
+        console.warn('Assets is not an array, converting');
+        // If it's a single object, wrap it in an array
+        if (typeof assets === 'object') {
+          assets = [assets];
+        } else {
+          assets = [];
+        }
+      }
+      
+      allAssets = assets;
+      console.log('Number of assets to display:', assets.length);
+      
+      // Update asset count if element exists
+      const assetCountEl = document.getElementById('assetCount');
+      if (assetCountEl) {
+        assetCountEl.textContent = assets.length;
+      }
+      
+      // Build table HTML
+      let tableHtml = '';
+      if (assets.length === 0) {
+        tableHtml = '<tr><td colspan="7">No assets found. Check the Assets sheet in your Google Spreadsheet.</td></tr>';
+      } else {
+        assets.forEach(function(asset, index) {
+          try {
+            console.log('Processing asset ' + index + ':', asset);
+            
+            // Safely get values with defaults
+            const id = asset.id || 'Unknown-' + index;
+            const name = asset.name || 'Unknown Asset';
+            const category = asset.category || 'Uncategorized';
+            const replacementCost = (typeof asset.replacementCost === 'number' ? asset.replacementCost : 0).toFixed(2);
+            const totalRepairs = (typeof asset.totalRepairs === 'number' ? asset.totalRepairs : 0).toFixed(2);
+            const percentOfReplacement = (typeof asset.percentOfReplacement === 'number' ? asset.percentOfReplacement * 100 : 0).toFixed(1);
+            
+            // Determine status and class
+            let status = asset.status || 'GOOD';
+            let statusClass = 'success';
+            const statusUpper = status.toString().toUpperCase();
+            
+            if (statusUpper.includes('REPLACE')) {
+              statusClass = 'danger';
+            } else if (statusUpper.includes('WARNING')) {
+              statusClass = 'warning';
+            } else if (statusUpper.includes('MONITOR')) {
+              statusClass = 'monitor';
+            } else if (statusUpper.includes('ERROR') || statusUpper.includes('#N/A')) {
+              statusClass = 'danger';
+              status = 'CHECK DATA';
+            }
+            
+            tableHtml += '<tr>' +
+              '<td>' + id + '</td>' +
+              '<td>' + name + '</td>' +
+              '<td>' + category + '</td>' +
+              '<td>$' + replacementCost + '</td>' +
+              '<td>$' + totalRepairs + '</td>' +
+              '<td>' + percentOfReplacement + '%</td>' +
+              '<td><span class="status-badge ' + statusClass + '">' + status + '</span></td>' +
+              '</tr>';
+              
+          } catch (err) {
+            console.error('Error processing asset at index ' + index + ':', err);
+          }
+        });
+      }
+      
+      // Update the table
+      document.getElementById('assetsTableBody').innerHTML = tableHtml;
+      console.log('Table updated');
+      
+      // Update dropdowns
+      let optionsHtml = '<option value="">Select an asset...</option>';
+      assets.forEach(function(asset) {
+        if (asset && asset.id) {
+          const name = asset.name || 'Unknown';
+          optionsHtml += '<option value="' + asset.id + '">' + asset.id + ' - ' + name + '</option>';
+        }
+      });
+      
+      const assetDropdown = document.getElementById('assetId');
+      if (assetDropdown) {
+        assetDropdown.innerHTML = optionsHtml;
+        console.log('Asset dropdown updated');
+      }
+      
+      const historyFilter = document.getElementById('historyFilter');
+      if (historyFilter) {
+        historyFilter.innerHTML = optionsHtml;
+      }
+      
+      console.log('Assets loading completed');
+    })
+    .withFailureHandler(function(error) {
+      console.error('Failed to load assets:', error);
+      document.getElementById('assetsTableBody').innerHTML = 
+        '<tr><td colspan="7">Error: ' + error.toString() + '</td></tr>';
+    })
+    .getAssets();
+}
+    
+    // Load repairs
+    // Replace BOTH loadRepairs and displayRepairs functions in index.html with these:
+
+function loadRepairs() {
+  console.log('=== LOADING REPAIRS ===');
+  
+  // Clear the table first
+  document.getElementById('historyTableBody').innerHTML = '<tr><td colspan="8">Loading repairs...</td></tr>';
+  
+  google.script.run
+    .withSuccessHandler(function(repairs) {
+      console.log('SUCCESS: Repairs received');
+      console.log('Type:', typeof repairs);
+      console.log('Is Array?:', Array.isArray(repairs));
+      console.log('Length:', repairs ? repairs.length : 'null');
+      console.log('Data:', repairs);
+      
+      // Force repairs to be an array
+      if (!repairs) {
+        console.log('Repairs is null, using empty array');
+        repairs = [];
+      } else if (!Array.isArray(repairs)) {
+        console.log('Repairs is not array, converting');
+        if (typeof repairs === 'object') {
+          repairs = [repairs];
+        } else {
+          repairs = [];
+        }
+      }
+      
+      // Store globally
+      allRepairs = repairs;
+      
+      // Display the repairs
+      displayRepairs(repairs);
+    })
+    .withFailureHandler(function(error) {
+      console.error('FAILED to load repairs:', error);
+      document.getElementById('historyTableBody').innerHTML = 
+        '<tr><td colspan="8" style="color: red;">Error: ' + error + '</td></tr>';
+    })
+    .getRepairs();
+}
+
+function displayRepairs(repairs) {
+  console.log('=== DISPLAYING REPAIRS ===');
+  console.log('Number to display:', repairs ? repairs.length : 0);
+  
+  const tbody = document.getElementById('historyTableBody');
+  
+  // Clear the table
+  tbody.innerHTML = '';
+  
+  if (!repairs || repairs.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8">No repairs found. Add a repair to see history.</td></tr>';
+    console.log('No repairs to display');
+    return;
+  }
+  
+  // Build table rows
+  let html = '';
+  
+  for (let i = 0; i < repairs.length; i++) {
+    try {
+      const repair = repairs[i];
+      console.log('Processing repair ' + i + ':', repair);
+      
+      // Get values with defaults
+      const assetId = repair.assetId || 'Unknown';
+      const partName = repair.partName || 'N/A';
+      
+      // Handle date
+      let dateStr = 'N/A';
+      if (repair.repairDate) {
+        try {
+          // Try parsing as string first
+          if (typeof repair.repairDate === 'string' && repair.repairDate.length > 0) {
+            const dateParts = repair.repairDate.split('-');
+            if (dateParts.length === 3) {
+              // Format as MM/DD/YYYY
+              dateStr = dateParts[1] + '/' + dateParts[2] + '/' + dateParts[0];
+            } else {
+              // Try to parse as date
+              const d = new Date(repair.repairDate);
+              if (!isNaN(d.getTime())) {
+                dateStr = (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+              } else {
+                dateStr = String(repair.repairDate);
+              }
+            }
+          } else if (repair.repairDate instanceof Date) {
+            dateStr = (repair.repairDate.getMonth() + 1) + '/' + 
+                      repair.repairDate.getDate() + '/' + 
+                      repair.repairDate.getFullYear();
+          }
+        } catch (e) {
+          console.error('Date parse error:', e);
+          dateStr = String(repair.repairDate || 'N/A');
+        }
+      }
+      
+      // Format numbers
+      const partCost = '$' + (Number(repair.partCost) || 0).toFixed(2);
+      const laborCost = '$' + (Number(repair.laborCost) || 0).toFixed(2);
+      const totalCost = '$' + (Number(repair.totalCost) || 0).toFixed(2);
+      const runningTotal = '$' + (Number(repair.runningTotal) || 0).toFixed(2);
+      const percentage = ((Number(repair.percentOfReplacement) || 0) * 100).toFixed(1) + '%';
+      
+      // Add row to HTML
+      html += '<tr>' +
+        '<td>' + assetId + '</td>' +
+        '<td>' + dateStr + '</td>' +
+        '<td>' + partName + '</td>' +
+        '<td>' + partCost + '</td>' +
+        '<td>' + laborCost + '</td>' +
+        '<td>' + totalCost + '</td>' +
+        '<td>' + runningTotal + '</td>' +
+        '<td>' + percentage + '</td>' +
+        '</tr>';
+        
+    } catch (error) {
+      console.error('Error processing repair ' + i + ':', error);
+      html += '<tr><td colspan="8" style="color: red;">Error displaying repair ' + i + '</td></tr>';
+    }
+  }
+  
+  // Update the table
+  tbody.innerHTML = html;
+  console.log('Table updated with ' + repairs.length + ' repairs');
+}
+
+// Also add this test function to manually check
+function testRepairDisplay() {
+  console.log('Testing repair display...');
+  
+  // Create fake data to test display
+  const testData = [{
+    repairId: 'TEST001',
+    assetId: 'Echo Blower PB-580T',
+    repairDate: '2025-01-15',
+    partName: 'Test Part',
+    partCost: 100,
+    laborCost: 80,
+    totalCost: 180,
+    runningTotal: 180,
+    percentOfReplacement: 0.2,
+    notes: 'Test'
+  }];
+  
+  console.log('Displaying test data:', testData);
+  displayRepairs(testData);
+}
+    
+    // Filter history
+    function filterHistory() {
+      const filterValue = document.getElementById('historyFilter').value;
+      if (filterValue) {
+        const filtered = allRepairs.filter(r => r.assetId === filterValue);
+        displayRepairs(filtered);
+      } else {
+        displayRepairs(allRepairs);
+      }
+    }
+    
+    // Setup form listeners
+    function setupFormListeners() {
+      // Update cost summary on form change
+      ['partCost', 'laborHours', 'laborRate'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updateCostSummary);
+        document.getElementById(id).addEventListener('change', updateCostSummary);
+      });
+    }
+    
+    // Update cost summary
+    function updateCostSummary() {
+      const partCost = parseFloat(document.getElementById('partCost').value) || 0;
+      const laborHours = parseFloat(document.getElementById('laborHours').value) || 0;
+      const laborRate = parseFloat(document.getElementById('laborRate').value) || 0;
+      
+      const laborCost = laborHours * laborRate;
+      const totalCost = partCost + laborCost;
+      
+      document.getElementById('summaryPart').textContent = partCost.toFixed(2);
+      document.getElementById('summaryLabor').textContent = laborCost.toFixed(2);
+      document.getElementById('summaryTotal').textContent = totalCost.toFixed(2);
+    }
+    
+    // Submit repair form
+    // Replace the submitRepair function in your index.html with this version
+function submitRepair(event) {
+  event.preventDefault();
+  
+  const repairData = {
+    assetId: document.getElementById('assetId').value,
+    repairDate: document.getElementById('repairDate').value,
+    partName: document.getElementById('partName').value,
+    partCost: document.getElementById('partCost').value,
+    laborHours: document.getElementById('laborHours').value,
+    laborRate: document.getElementById('laborRate').value,
+    notes: document.getElementById('notes').value
+  };
+  
+  console.log('Submitting repair:', repairData);
+  
+  // Show loading message
+  document.getElementById('repairMessage').innerHTML = '<div class="message info">Adding repair...</div>';
+  
+  // Submit to server
+  google.script.run
+    .withSuccessHandler(function(response) {
+      console.log('Repair response:', response);
+      if (response && response.success) {
+        // Use the message from the server or create a fallback
+        let message = response.message;
+        if (!message) {
+          // Create fallback message if none provided
+          const runningTotal = Number(response.runningTotal) || 0;
+          const percentage = Number(response.percentOfReplacement) || 0;
+          message = 'Repair added successfully! Total repairs: $' + runningTotal.toFixed(2) + 
+                   ' (' + (percentage * 100).toFixed(1) + '% of replacement cost)';
+        }
+        
+        document.getElementById('repairMessage').innerHTML = '<div class="message success">' + message + '</div>';
+        document.getElementById('repairForm').reset();
+        document.getElementById('repairDate').valueAsDate = new Date();
+        updateCostSummary();
+        
+        // Reload data
+        setTimeout(function() {
+          loadAssets();
+          loadRepairs();
+          loadDashboard();
+        }, 1000); // Small delay to ensure the server has saved the data
+        
+        // Clear message after 5 seconds
+        setTimeout(function() {
+          document.getElementById('repairMessage').innerHTML = '';
+        }, 5000);
+      } else {
+        const errorMessage = response ? response.message : 'Unknown error occurred';
+        document.getElementById('repairMessage').innerHTML = '<div class="message error">' + errorMessage + '</div>';
+      }
+    })
+    .withFailureHandler(function(error) {
+      console.error('Repair submit error:', error);
+      document.getElementById('repairMessage').innerHTML = '<div class="message error">Error: ' + error + '</div>';
+    })
+    .addRepair(repairData);
+}
+  </script>
+</body>
+</html>
