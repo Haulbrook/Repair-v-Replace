@@ -377,6 +377,97 @@ function recalculateRunningTotals(assetId) {
 }
 
 // ============================================
+// AUTO-SYNC FUNCTIONS (For External Data)
+// ============================================
+
+/**
+ * INSTALLABLE TRIGGER - Auto-syncs when Repairs sheet changes.
+ * Set up via: Triggers > Add Trigger > onRepairsChange > On change
+ * This makes external data pushes seamless - no manual sync needed.
+ */
+function onRepairsChange(e) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const repairsSheet = ss.getSheetByName(SHEETS.REPAIRS);
+
+    if (!repairsSheet) return;
+
+    // Get all unique asset IDs that need recalculation
+    const repairsData = repairsSheet.getDataRange().getValues();
+    const assetIdsToSync = new Set();
+
+    for (let i = 1; i < repairsData.length; i++) {
+      const row = repairsData[i];
+      const assetId = String(row[REPAIR_COLUMNS.ASSET_ID] || '').trim();
+      const runningTotal = row[REPAIR_COLUMNS.RUNNING_TOTAL];
+
+      // If running total is empty/zero but there's an asset ID, needs sync
+      if (assetId && (!runningTotal || runningTotal === 0 || runningTotal === '')) {
+        assetIdsToSync.add(assetId);
+      }
+    }
+
+    // Sync only the assets that need it
+    if (assetIdsToSync.size > 0) {
+      console.log('Auto-syncing ' + assetIdsToSync.size + ' assets...');
+      assetIdsToSync.forEach(function(assetId) {
+        recalculateRunningTotals(assetId);
+        updateAssetTotals(assetId);
+      });
+      console.log('Auto-sync complete.');
+    }
+  } catch (error) {
+    console.error('Error in onRepairsChange:', error);
+  }
+}
+
+/**
+ * One-time function to fix all existing data.
+ * Run this ONCE from Apps Script editor after deploying.
+ * After that, the trigger handles everything automatically.
+ */
+function recalculateAllAssets() {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const repairsSheet = ss.getSheetByName(SHEETS.REPAIRS);
+    const assetsSheet = ss.getSheetByName(SHEETS.ASSETS);
+
+    if (!repairsSheet || !assetsSheet) {
+      console.log('Required sheets not found');
+      return { success: false, message: 'Required sheets not found' };
+    }
+
+    const repairsData = repairsSheet.getDataRange().getValues();
+    const assetsData = assetsSheet.getDataRange().getValues();
+    const assetIds = new Set();
+
+    // Get all asset IDs from both sheets
+    for (let i = 1; i < assetsData.length; i++) {
+      const assetId = assetsData[i][ASSET_COLUMNS.ASSET_ID];
+      if (assetId) assetIds.add(String(assetId).trim());
+    }
+    for (let i = 1; i < repairsData.length; i++) {
+      const assetId = repairsData[i][REPAIR_COLUMNS.ASSET_ID];
+      if (assetId) assetIds.add(String(assetId).trim());
+    }
+
+    console.log('Recalculating ' + assetIds.size + ' assets...');
+    let processed = 0;
+    assetIds.forEach(function(assetId) {
+      recalculateRunningTotals(assetId);
+      updateAssetTotals(assetId);
+      processed++;
+    });
+
+    console.log('Recalculation complete. Processed ' + processed + ' assets.');
+    return { success: true, message: 'Recalculated ' + processed + ' assets' };
+  } catch (error) {
+    console.error('Error in recalculateAllAssets:', error);
+    return { success: false, message: error.toString() };
+  }
+}
+
+// ============================================
 // DASHBOARD FUNCTIONS
 // ============================================
 
