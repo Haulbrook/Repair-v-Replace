@@ -232,7 +232,7 @@ function addRepair(repairData) {
 
     return {
       success: true,
-      message: 'Repair added successfully! New total:  + newRunningTotal.toFixed(2) + ' (' + (percentOfReplacement * 100).toFixed(1) + '% of replacement cost)'
+      message: 'Repair added successfully! New total: $' + newRunningTotal.toFixed(2) + ' (' + (percentOfReplacement * 100).toFixed(1) + '% of replacement cost)'
     };
   } catch (error) {
     console.error('Error adding repair:', error);
