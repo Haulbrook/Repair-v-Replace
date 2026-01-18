@@ -201,6 +201,7 @@ function displayDashboardStats(stats) {
   // Update stat numbers
   document.getElementById('totalAssets').textContent = stats.totalAssets || 0;
   document.getElementById('goodAssets').textContent = stats.good || 0;
+  document.getElementById('monitorAssets').textContent = stats.monitor || 0;
   document.getElementById('warningAssets').textContent = stats.warnings || 0;
   document.getElementById('replaceAssets').textContent = stats.needReplacement || 0;
   document.getElementById('totalRepairCost').textContent = '$' + (stats.totalRepairCost || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -534,6 +535,9 @@ function resetRepairForm() {
 // REPAIR HISTORY FUNCTIONS
 // ============================================
 
+let currentView = 'grouped';
+let expandedAssets = new Set();
+
 function loadRepairs() {
   console.log('Loading repairs...');
 
@@ -541,48 +545,392 @@ function loadRepairs() {
     .withSuccessHandler(function(repairs) {
       console.log('Repairs received:', repairs);
       allRepairs = repairs || [];
-      displayRepairs(allRepairs);
+      applyFiltersAndDisplay();
     })
     .withFailureHandler(function(error) {
       console.error('Failed to load repairs:', error);
-      document.getElementById('historyTableBody').innerHTML =
-        '<tr><td colspan="9" class="loading-cell">Error loading repairs: ' + error + '</td></tr>';
+      document.getElementById('historyGroupedContainer').innerHTML =
+        '<div class="loading-message">Error loading repairs: ' + error + '</div>';
     })
     .getRepairs();
 }
 
-function displayRepairs(repairs) {
+// ============================================
+// VIEW MANAGEMENT
+// ============================================
+
+function setView(view) {
+  currentView = view;
+
+  // Update button states
+  document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('view' + view.charAt(0).toUpperCase() + view.slice(1)).classList.add('active');
+
+  // Hide all containers
+  document.getElementById('historyGroupedContainer').style.display = 'none';
+  document.getElementById('historyCardsContainer').style.display = 'none';
+  document.getElementById('historyTableContainer').style.display = 'none';
+
+  // Show selected container
+  if (view === 'grouped') {
+    document.getElementById('historyGroupedContainer').style.display = 'block';
+  } else if (view === 'cards') {
+    document.getElementById('historyCardsContainer').style.display = 'block';
+  } else if (view === 'table') {
+    document.getElementById('historyTableContainer').style.display = 'block';
+  }
+
+  applyFiltersAndDisplay();
+}
+
+function toggleFilterBar() {
+  const content = document.getElementById('filterBarContent');
+  const toggleText = document.getElementById('filterToggleText');
+
+  if (content.style.display === 'none') {
+    content.style.display = 'block';
+    toggleText.textContent = 'Hide Filters';
+  } else {
+    content.style.display = 'none';
+    toggleText.textContent = 'Show Filters';
+  }
+}
+
+function clearAllFilters() {
+  document.getElementById('historySearch').value = '';
+  document.getElementById('historyAssetFilter').value = '';
+  document.getElementById('historyStatusFilter').value = '';
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value = '';
+  document.getElementById('costMin').value = '';
+  document.getElementById('costMax').value = '';
+  document.getElementById('partNameFilter').value = '';
+  document.getElementById('hasNotesFilter').checked = false;
+
+  applyFiltersAndDisplay();
+}
+
+// ============================================
+// ADVANCED FILTERING
+// ============================================
+
+function getStatusFromPercent(percent) {
+  const pct = percent * 100;
+  if (pct >= 75) return 'replace';
+  if (pct >= 50) return 'warning';
+  if (pct >= 25) return 'monitor';
+  return 'good';
+}
+
+function applyFiltersAndDisplay() {
+  const searchTerm = (document.getElementById('historySearch')?.value || '').toLowerCase();
+  const assetFilter = document.getElementById('historyAssetFilter')?.value || '';
+  const statusFilter = document.getElementById('historyStatusFilter')?.value || '';
+  const dateFrom = document.getElementById('dateFrom')?.value || '';
+  const dateTo = document.getElementById('dateTo')?.value || '';
+  const costMin = parseFloat(document.getElementById('costMin')?.value) || 0;
+  const costMax = parseFloat(document.getElementById('costMax')?.value) || Infinity;
+  const partNameFilter = (document.getElementById('partNameFilter')?.value || '').toLowerCase();
+  const hasNotesFilter = document.getElementById('hasNotesFilter')?.checked || false;
+
+  let filtered = allRepairs.filter(r => {
+    // Asset filter
+    if (assetFilter && r.assetId !== assetFilter) return false;
+
+    // Status filter
+    if (statusFilter) {
+      const repairStatus = getStatusFromPercent(r.percentOfReplacement || 0);
+      if (repairStatus !== statusFilter) return false;
+    }
+
+    // Date range filter
+    if (dateFrom) {
+      const repairDate = new Date(r.repairDate);
+      const fromDate = new Date(dateFrom);
+      if (repairDate < fromDate) return false;
+    }
+    if (dateTo) {
+      const repairDate = new Date(r.repairDate);
+      const toDate = new Date(dateTo);
+      toDate.setHours(23, 59, 59); // Include the entire end date
+      if (repairDate > toDate) return false;
+    }
+
+    // Cost range filter
+    const totalCost = r.totalCost || 0;
+    if (totalCost < costMin) return false;
+    if (costMax !== Infinity && totalCost > costMax) return false;
+
+    // Part name filter
+    if (partNameFilter && !(r.partName || '').toLowerCase().includes(partNameFilter)) return false;
+
+    // Has notes filter
+    if (hasNotesFilter && !(r.notes && r.notes.trim())) return false;
+
+    // General search (searches all text fields)
+    if (searchTerm) {
+      const searchFields = [
+        r.repairId, r.assetId, r.assetName, r.partName, r.notes
+      ].map(f => (f || '').toLowerCase());
+
+      if (!searchFields.some(f => f.includes(searchTerm))) return false;
+    }
+
+    return true;
+  });
+
+  // Update results count
+  document.getElementById('resultsCount').textContent = filtered.length;
+
+  // Display based on current view
+  if (currentView === 'grouped') {
+    displayRepairsGrouped(filtered);
+  } else if (currentView === 'cards') {
+    displayRepairsCards(filtered);
+  } else {
+    displayRepairsTable(filtered);
+  }
+}
+
+// ============================================
+// GROUPED VIEW
+// ============================================
+
+function toggleAssetSection(assetId) {
+  const content = document.getElementById('asset-content-' + assetId);
+  const header = document.getElementById('asset-header-' + assetId);
+  const icon = header.querySelector('.expand-icon');
+
+  if (expandedAssets.has(assetId)) {
+    expandedAssets.delete(assetId);
+    content.style.display = 'none';
+    icon.textContent = '▶';
+    header.classList.remove('expanded');
+  } else {
+    expandedAssets.add(assetId);
+    content.style.display = 'block';
+    icon.textContent = '▼';
+    header.classList.add('expanded');
+  }
+}
+
+function displayRepairsGrouped(repairs) {
+  const container = document.getElementById('historyGroupedContainer');
+
+  if (!repairs || repairs.length === 0) {
+    container.innerHTML = '<div class="loading-message">No repairs match your filters</div>';
+    return;
+  }
+
+  // Group repairs by asset
+  const grouped = {};
+  repairs.forEach(r => {
+    const key = r.assetId || 'Unknown';
+    if (!grouped[key]) {
+      grouped[key] = {
+        assetId: r.assetId,
+        assetName: r.assetName,
+        repairs: [],
+        totalCost: 0
+      };
+    }
+    grouped[key].repairs.push(r);
+    grouped[key].totalCost += (r.totalCost || 0);
+  });
+
+  let html = '';
+  Object.keys(grouped).sort().forEach(assetId => {
+    const group = grouped[assetId];
+    const isExpanded = expandedAssets.has(assetId);
+    const latestRepair = group.repairs[0];
+    const statusClass = getStatusClass(getStatusFromPercent(latestRepair?.percentOfReplacement || 0));
+
+    html += `
+      <div class="asset-group">
+        <div class="asset-group-header ${isExpanded ? 'expanded' : ''}" id="asset-header-${assetId}" onclick="toggleAssetSection('${assetId}')">
+          <div class="asset-group-info">
+            <span class="expand-icon">${isExpanded ? '▼' : '▶'}</span>
+            <span class="asset-group-name">${group.assetName || assetId}</span>
+            <span class="asset-group-id">(${assetId})</span>
+          </div>
+          <div class="asset-group-meta">
+            <span class="repair-count">${group.repairs.length} repair${group.repairs.length !== 1 ? 's' : ''}</span>
+            <span class="total-cost">$${group.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+            <span class="status-badge ${statusClass}">${getStatusText(getStatusFromPercent(latestRepair?.percentOfReplacement || 0))}</span>
+          </div>
+        </div>
+        <div class="asset-group-content" id="asset-content-${assetId}" style="display: ${isExpanded ? 'block' : 'none'};">
+    `;
+
+    group.repairs.forEach(repair => {
+      html += renderRepairCard(repair);
+    });
+
+    html += `
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+// ============================================
+// CARDS VIEW
+// ============================================
+
+function displayRepairsCards(repairs) {
+  const container = document.getElementById('historyCardsContainer');
+
+  if (!repairs || repairs.length === 0) {
+    container.innerHTML = '<div class="loading-message">No repairs match your filters</div>';
+    return;
+  }
+
+  let html = '<div class="repair-cards-grid">';
+  repairs.forEach(repair => {
+    html += renderRepairCard(repair);
+  });
+  html += '</div>';
+
+  container.innerHTML = html;
+}
+
+function renderRepairCard(repair) {
+  const repairDate = repair.repairDate ? formatDate(repair.repairDate) : 'N/A';
+  const percent = ((repair.percentOfReplacement || 0) * 100).toFixed(1);
+  const statusClass = getStatusClass(getStatusFromPercent(repair.percentOfReplacement || 0));
+
+  return `
+    <div class="repair-card">
+      <div class="repair-card-header">
+        <div class="repair-card-title">
+          <span class="repair-id">${repair.repairId || 'N/A'}</span>
+          <span class="status-badge ${statusClass}">${percent}%</span>
+        </div>
+        <button class="btn btn-danger btn-small" onclick="confirmDeleteRepair('${repair.repairId}')">Delete</button>
+      </div>
+
+      <div class="repair-card-body">
+        <div class="card-section">
+          <h4>Identification</h4>
+          <div class="card-row">
+            <span class="card-label">Asset:</span>
+            <span class="card-value">${repair.assetName || repair.assetId || 'N/A'}</span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Asset ID:</span>
+            <span class="card-value">${repair.assetId || 'N/A'}</span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Date:</span>
+            <span class="card-value">${repairDate}</span>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h4>Costs</h4>
+          <div class="card-row">
+            <span class="card-label">Part Cost:</span>
+            <span class="card-value">$${(repair.partCost || 0).toFixed(2)}</span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Labor Hours:</span>
+            <span class="card-value">${repair.laborHours || 0}</span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Labor Rate:</span>
+            <span class="card-value">$${(repair.laborRate || 0).toFixed(2)}/hr</span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Labor Cost:</span>
+            <span class="card-value">$${(repair.laborCost || 0).toFixed(2)}</span>
+          </div>
+          <div class="card-row highlight">
+            <span class="card-label">Total:</span>
+            <span class="card-value">$${(repair.totalCost || 0).toFixed(2)}</span>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h4>Repair Details</h4>
+          <div class="card-row">
+            <span class="card-label">Part:</span>
+            <span class="card-value">${repair.partName || 'N/A'}</span>
+          </div>
+          ${repair.notes ? `
+          <div class="card-row notes">
+            <span class="card-label">Notes:</span>
+            <span class="card-value">${repair.notes}</span>
+          </div>
+          ` : ''}
+        </div>
+
+        <div class="card-section">
+          <h4>Running Totals</h4>
+          <div class="card-row">
+            <span class="card-label">Running Total:</span>
+            <span class="card-value">$${(repair.runningTotal || 0).toFixed(2)}</span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">% of Replace:</span>
+            <span class="card-value">${percent}%</span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">Days Since Last:</span>
+            <span class="card-value">${repair.daysSinceLast || 'N/A'}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================
+// TABLE VIEW
+// ============================================
+
+function displayRepairsTable(repairs) {
   const tbody = document.getElementById('historyTableBody');
 
   if (!repairs || repairs.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="9" class="loading-cell">No repair history found</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="14" class="loading-cell">No repairs match your filters</td></tr>';
     return;
   }
 
   let html = '';
   repairs.forEach(repair => {
     const repairDate = repair.repairDate ? formatDate(repair.repairDate) : 'N/A';
+    const percent = ((repair.percentOfReplacement || 0) * 100).toFixed(1);
 
     html += `
       <tr>
-        <td>${repair.assetId || 'N/A'}</td>
+        <td title="${repair.repairId || ''}">${(repair.repairId || 'N/A').substring(0, 12)}...</td>
+        <td>${repair.assetName || repair.assetId || 'N/A'}</td>
         <td>${repairDate}</td>
         <td>${repair.partName || 'N/A'}</td>
         <td>$${(repair.partCost || 0).toFixed(2)}</td>
+        <td>${repair.laborHours || 0}</td>
+        <td>$${(repair.laborRate || 0).toFixed(0)}</td>
         <td>$${(repair.laborCost || 0).toFixed(2)}</td>
         <td>$${(repair.totalCost || 0).toFixed(2)}</td>
         <td>$${(repair.runningTotal || 0).toFixed(2)}</td>
-        <td>${((repair.percentOfReplacement || 0) * 100).toFixed(1)}%</td>
+        <td>${percent}%</td>
+        <td>${repair.daysSinceLast || '-'}</td>
+        <td title="${repair.notes || ''}">${(repair.notes || '-').substring(0, 20)}${(repair.notes || '').length > 20 ? '...' : ''}</td>
         <td>
-          <button class="btn btn-danger" onclick="confirmDeleteRepair('${repair.repairId}')" style="padding: var(--spacing-2) var(--spacing-3); font-size: var(--font-size-xs);">
-            Delete
-          </button>
+          <button class="btn btn-danger btn-small" onclick="confirmDeleteRepair('${repair.repairId}')">Del</button>
         </td>
       </tr>
     `;
   });
 
   tbody.innerHTML = html;
+}
+
+// Keep old displayRepairs for backward compatibility
+function displayRepairs(repairs) {
+  applyFiltersAndDisplay();
 }
 
 function formatDate(dateStr) {
@@ -645,39 +993,22 @@ function populateHistoryFilter() {
   filter.innerHTML = html;
 }
 
-// History filtering
+// History filtering - attach listeners to all filter inputs
 document.addEventListener('DOMContentLoaded', function() {
-  const searchInput = document.getElementById('historySearch');
-  const filterSelect = document.getElementById('historyAssetFilter');
+  const filterInputs = [
+    'historySearch', 'historyAssetFilter', 'historyStatusFilter',
+    'dateFrom', 'dateTo', 'costMin', 'costMax', 'partNameFilter', 'hasNotesFilter'
+  ];
 
-  if (searchInput) {
-    searchInput.addEventListener('input', filterRepairs);
-  }
-
-  if (filterSelect) {
-    filterSelect.addEventListener('change', filterRepairs);
-  }
-});
-
-function filterRepairs() {
-  const searchTerm = document.getElementById('historySearch').value.toLowerCase();
-  const assetFilter = document.getElementById('historyAssetFilter').value;
-
-  let filtered = allRepairs;
-
-  if (assetFilter) {
-    filtered = filtered.filter(r => r.assetId === assetFilter);
-  }
-
-  if (searchTerm) {
-    filtered = filtered.filter(r =>
-      (r.assetId || '').toLowerCase().includes(searchTerm) ||
-      (r.partName || '').toLowerCase().includes(searchTerm)
-    );
-  }
-
-  displayRepairs(filtered);
-}
+  filterInputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      const eventType = (el.type === 'checkbox') ? 'change' :
+                       (el.tagName === 'SELECT') ? 'change' : 'input';
+      el.addEventListener(eventType, applyFiltersAndDisplay);
+    }
+  });
+})
 
 // ============================================
 // UTILITY FUNCTIONS

@@ -102,6 +102,19 @@
                 </div>
 
                 <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-icon gradient-yellow">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="16" cy="16" r="12"/>
+                            <path d="M16 10v6M16 20v2"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Monitor</div>
+                        <div class="stat-number" id="monitorAssets">0</div>
+                    </div>
+                </div>
+
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
                     <div class="stat-icon gradient-orange">
                         <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M16 4L4 16l12 12 12-12L16 4z"/>
@@ -109,12 +122,12 @@
                         </svg>
                     </div>
                     <div class="stat-info">
-                        <div class="stat-label">Needs Attention</div>
+                        <div class="stat-label">Warning</div>
                         <div class="stat-number" id="warningAssets">0</div>
                     </div>
                 </div>
 
-                <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
                     <div class="stat-icon gradient-pink">
                         <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="16" cy="16" r="12"/>
@@ -127,7 +140,7 @@
                     </div>
                 </div>
 
-                <div class="stat-card wide" data-aos="fade-up" data-aos-delay="400">
+                <div class="stat-card wide" data-aos="fade-up" data-aos-delay="500">
                     <div class="stat-icon gradient-purple">
                         <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="16" cy="16" r="12"/>
@@ -140,7 +153,7 @@
                     </div>
                 </div>
 
-                <div class="stat-card wide" data-aos="fade-up" data-aos-delay="500">
+                <div class="stat-card wide" data-aos="fade-up" data-aos-delay="600">
                     <div class="stat-icon gradient-teal">
                         <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M4 28h24M8 24V12M14 24V8M20 24V16M26 24V4"/>
@@ -154,7 +167,7 @@
             </div>
 
             <!-- Top Problems -->
-            <div class="top-problems-section" data-aos="fade-up" data-aos-delay="600" style="position: relative; z-index: 1;">
+            <div class="top-problems-section" data-aos="fade-up" data-aos-delay="700" style="position: relative; z-index: 1;">
                 <h2 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin-bottom: var(--spacing-6);">Assets Requiring Attention</h2>
                 <div id="topProblemsContainer" class="top-problems-grid">
                     <div class="loading-message">Loading assets...</div>
@@ -321,31 +334,145 @@
                 <p class="section-subtitle">Complete history of all repairs across all assets</p>
             </div>
 
-            <div class="history-filters">
-                <input type="text" id="historySearch" class="form-control" placeholder="Search by asset ID or part name...">
-                <select id="historyAssetFilter" class="form-control">
-                    <option value="">All Assets</option>
-                </select>
+            <!-- Advanced Filter Bar -->
+            <div class="filter-bar" id="filterBar">
+                <div class="filter-bar-header">
+                    <h3>Filters</h3>
+                    <button type="button" class="btn btn-secondary btn-small" id="toggleFiltersBtn" onclick="toggleFilterBar()">
+                        <span id="filterToggleText">Hide Filters</span>
+                    </button>
+                </div>
+
+                <div class="filter-bar-content" id="filterBarContent">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="historySearch">Search All Fields</label>
+                            <input type="text" id="historySearch" class="form-control" placeholder="Search repairs...">
+                        </div>
+                        <div class="filter-group">
+                            <label for="historyAssetFilter">Asset</label>
+                            <select id="historyAssetFilter" class="form-control">
+                                <option value="">All Assets</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="historyStatusFilter">Status</label>
+                            <select id="historyStatusFilter" class="form-control">
+                                <option value="">All Statuses</option>
+                                <option value="good">Good (&lt;25%)</option>
+                                <option value="monitor">Monitor (25-49%)</option>
+                                <option value="warning">Warning (50-74%)</option>
+                                <option value="replace">Replace Now (75%+)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="dateFrom">Date From</label>
+                            <input type="date" id="dateFrom" class="form-control">
+                        </div>
+                        <div class="filter-group">
+                            <label for="dateTo">Date To</label>
+                            <input type="date" id="dateTo" class="form-control">
+                        </div>
+                        <div class="filter-group">
+                            <label for="costMin">Min Cost ($)</label>
+                            <input type="number" id="costMin" class="form-control" placeholder="0" min="0" step="0.01">
+                        </div>
+                        <div class="filter-group">
+                            <label for="costMax">Max Cost ($)</label>
+                            <input type="number" id="costMax" class="form-control" placeholder="Any" min="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="partNameFilter">Part Name Contains</label>
+                            <input type="text" id="partNameFilter" class="form-control" placeholder="Filter by part...">
+                        </div>
+                        <div class="filter-group filter-checkbox">
+                            <label>
+                                <input type="checkbox" id="hasNotesFilter"> Only show repairs with notes
+                            </label>
+                        </div>
+                        <div class="filter-group">
+                            <button type="button" class="btn btn-secondary" onclick="clearAllFilters()">Clear All Filters</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="history-table-container">
+            <!-- View Toggle -->
+            <div class="view-controls">
+                <div class="view-toggle">
+                    <button type="button" class="view-btn active" id="viewGrouped" onclick="setView('grouped')">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="5" height="5" rx="1"/>
+                            <rect x="2" y="11" width="5" height="5" rx="1"/>
+                            <line x1="10" y1="4" x2="16" y2="4"/>
+                            <line x1="10" y1="13" x2="16" y2="13"/>
+                        </svg>
+                        Grouped by Asset
+                    </button>
+                    <button type="button" class="view-btn" id="viewCards" onclick="setView('cards')">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="6" height="6" rx="1"/>
+                            <rect x="10" y="2" width="6" height="6" rx="1"/>
+                            <rect x="2" y="10" width="6" height="6" rx="1"/>
+                            <rect x="10" y="10" width="6" height="6" rx="1"/>
+                        </svg>
+                        Cards
+                    </button>
+                    <button type="button" class="view-btn" id="viewTable" onclick="setView('table')">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="14" height="14" rx="1"/>
+                            <line x1="2" y1="7" x2="16" y2="7"/>
+                            <line x1="2" y1="12" x2="16" y2="12"/>
+                            <line x1="7" y1="2" x2="7" y2="16"/>
+                        </svg>
+                        Table
+                    </button>
+                </div>
+                <div class="results-count">
+                    <span id="resultsCount">0</span> repairs found
+                </div>
+            </div>
+
+            <!-- Grouped View Container -->
+            <div class="history-grouped-container" id="historyGroupedContainer">
+                <div class="loading-message">Loading repair history...</div>
+            </div>
+
+            <!-- Cards View Container -->
+            <div class="history-cards-container" id="historyCardsContainer" style="display: none;">
+                <div class="loading-message">Loading repair history...</div>
+            </div>
+
+            <!-- Table View Container -->
+            <div class="history-table-container" id="historyTableContainer" style="display: none;">
                 <table class="history-table">
                     <thead>
                         <tr>
-                            <th>Asset ID</th>
-                            <th>Repair Date</th>
-                            <th>Part Name</th>
-                            <th>Part Cost</th>
-                            <th>Labor Cost</th>
-                            <th>Total Cost</th>
-                            <th>Running Total</th>
-                            <th>% of Replace</th>
+                            <th>Repair ID</th>
+                            <th>Asset</th>
+                            <th>Date</th>
+                            <th>Part</th>
+                            <th>Part $</th>
+                            <th>Labor Hrs</th>
+                            <th>Labor Rate</th>
+                            <th>Labor $</th>
+                            <th>Total</th>
+                            <th>Running</th>
+                            <th>%</th>
+                            <th>Days Since</th>
+                            <th>Notes</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="historyTableBody">
                         <tr>
-                            <td colspan="9" class="loading-cell">Loading repair history...</td>
+                            <td colspan="14" class="loading-cell">Loading repair history...</td>
                         </tr>
                     </tbody>
                 </table>
