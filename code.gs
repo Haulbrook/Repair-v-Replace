@@ -17,18 +17,20 @@ const SHEETS = {
 };
 
 // Column mappings for Assets sheet (0-indexed)
+// UPDATED to match actual spreadsheet structure
 const ASSET_COLUMNS = {
-  ASSET_ID: 0,            // A
-  ASSET_NAME: 1,          // B
-  CATEGORY: 2,            // C
-  MANUFACTURER: 3,        // D
-  MODEL: 4,               // E
-  PURCHASE_DATE: 5,       // F
-  NOTES: 6,               // G
-  REPLACEMENT_COST: 7,    // H
-  TOTAL_REPAIRS: 8,       // I
-  PCT_OF_REPLACEMENT: 9,  // J
-  STATUS: 10              // K
+  ASSET_NAME: 0,          // A
+  ASSET_ID: 1,            // B
+  RFID: 2,                // C
+  CATEGORY: 3,            // D
+  MANUFACTURER: 4,        // E
+  MODEL: 5,               // F
+  PURCHASE_DATE: 6,       // G
+  NOTES: 7,               // H
+  REPLACEMENT_COST: 8,    // I
+  TOTAL_REPAIRS: 9,       // J
+  PCT_OF_REPLACEMENT: 10, // K
+  STATUS: 11              // L
 };
 
 // Column mappings for Repairs sheet (0-indexed)
