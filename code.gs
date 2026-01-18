@@ -7,6 +7,23 @@
 
 const SPREADSHEET_ID = '1aF_6nHHp8NA-eETkwZMUuTlPRPOiiKEvou-F9QuVTD8';
 
+// Master Assets sheet (single source of truth for asset info)
+const MASTER_ASSETS_ID = '1AmyIFL74or_Nh0QLMu_n18YosrSP9E4EA6k5MTzlq1Y';
+const MASTER_SHEET_NAME = 'Master';
+
+// Master Assets column mapping (from Shop Tickets config)
+const MASTER_COLS = {
+  NAME: 2,              // C
+  DEPARTMENT: 3,        // D
+  ASSET_NUMBER: 4,      // E
+  RFID: 5,              // F
+  MODEL_NUM: 7,         // H
+  MAKE: 8,              // I
+  NOTES: 10,            // K
+  DATE_OF_PURCHASE: 14, // O
+  REPLACEMENT_COST: 41  // AP
+};
+
 // Sheet names
 const SHEETS = {
   ASSETS: 'Assets',
@@ -465,6 +482,89 @@ function recalculateAllAssets() {
     return { success: true, message: 'Recalculated ' + processed + ' assets' };
   } catch (error) {
     console.error('Error in recalculateAllAssets:', error);
+    return { success: false, message: error.toString() };
+  }
+}
+
+/**
+ * Syncs assets from Master Assets sheet to local Assets sheet.
+ * Preserves local calculated values (Total Repairs, %, Status).
+ * Run manually or via time-based trigger.
+ *
+ * This ensures Shop Tickets and Repair v Replace use the same Asset IDs.
+ */
+function syncAssetsFromMaster() {
+  try {
+    const masterSS = SpreadsheetApp.openById(MASTER_ASSETS_ID);
+    const masterSheet = masterSS.getSheetByName(MASTER_SHEET_NAME);
+
+    const localSS = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const localSheet = localSS.getSheetByName(SHEETS.ASSETS);
+
+    if (!masterSheet || !localSheet) {
+      console.log('Required sheets not found');
+      return { success: false, message: 'Sheets not found' };
+    }
+
+    const masterData = masterSheet.getDataRange().getValues();
+    const localData = localSheet.getDataRange().getValues();
+
+    // Build map of existing local assets by Asset ID
+    const localAssetMap = new Map();
+    for (let i = 1; i < localData.length; i++) {
+      const assetId = String(localData[i][ASSET_COLUMNS.ASSET_ID] || '').trim();
+      if (assetId) {
+        localAssetMap.set(assetId, {
+          rowIndex: i + 1,
+          totalRepairs: localData[i][ASSET_COLUMNS.TOTAL_REPAIRS] || 0,
+          pctOfReplacement: localData[i][ASSET_COLUMNS.PCT_OF_REPLACEMENT] || 0,
+          status: localData[i][ASSET_COLUMNS.STATUS] || 'GOOD'
+        });
+      }
+    }
+
+    let added = 0;
+    let updated = 0;
+
+    // Process each asset from Master
+    for (let i = 1; i < masterData.length; i++) {
+      const row = masterData[i];
+      const assetId = String(row[MASTER_COLS.ASSET_NUMBER] || '').trim();
+      const assetName = String(row[MASTER_COLS.NAME] || '').trim();
+
+      // Skip rows without Asset ID or Name
+      if (!assetId || !assetName) continue;
+
+      const assetData = [
+        assetName,                                          // A - Asset Name
+        assetId,                                            // B - Asset ID
+        String(row[MASTER_COLS.RFID] || ''),               // C - RFID
+        String(row[MASTER_COLS.DEPARTMENT] || ''),         // D - Category
+        String(row[MASTER_COLS.MAKE] || ''),               // E - Manufacturer
+        String(row[MASTER_COLS.MODEL_NUM] || ''),          // F - Model
+        row[MASTER_COLS.DATE_OF_PURCHASE] || '',           // G - Purchase Date
+        String(row[MASTER_COLS.NOTES] || ''),              // H - Notes
+        parseFloat(row[MASTER_COLS.REPLACEMENT_COST]) || 0 // I - Replacement Cost
+      ];
+
+      if (localAssetMap.has(assetId)) {
+        // Update existing asset (preserve calculated values)
+        const existing = localAssetMap.get(assetId);
+        const fullRow = [...assetData, existing.totalRepairs, existing.pctOfReplacement, existing.status];
+        localSheet.getRange(existing.rowIndex, 1, 1, 12).setValues([fullRow]);
+        updated++;
+      } else {
+        // Add new asset
+        const fullRow = [...assetData, 0, 0, 'GOOD'];
+        localSheet.appendRow(fullRow);
+        added++;
+      }
+    }
+
+    console.log('Sync complete. Added: ' + added + ', Updated: ' + updated);
+    return { success: true, added: added, updated: updated };
+  } catch (error) {
+    console.error('Error syncing from Master:', error);
     return { success: false, message: error.toString() };
   }
 }
