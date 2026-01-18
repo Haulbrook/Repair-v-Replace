@@ -484,6 +484,149 @@ function getSettings() {
 }
 
 // ============================================
+// DATA VALIDATION FUNCTIONS
+// ============================================
+
+/**
+ * Validates repair data integrity and checks for common integration issues.
+ * Run this manually to identify problems with data from feeding systems.
+ * @returns {Object} Validation results with issues found
+ */
+function validateRepairsData() {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const repairsSheet = ss.getSheetByName(SHEETS.REPAIRS);
+    const assetsSheet = ss.getSheetByName(SHEETS.ASSETS);
+
+    if (!repairsSheet || !assetsSheet) {
+      return {
+        success: false,
+        message: 'Required sheets not found',
+        issues: []
+      };
+    }
+
+    const repairsData = repairsSheet.getDataRange().getValues();
+    const assetsData = assetsSheet.getDataRange().getValues();
+
+    // Build set of valid asset IDs
+    const validAssetIds = new Set();
+    for (let i = 1; i < assetsData.length; i++) {
+      const assetId = assetsData[i][ASSET_COLUMNS.ASSET_ID];
+      if (assetId) {
+        validAssetIds.add(String(assetId).trim());
+      }
+    }
+
+    const issues = [];
+    let orphanedRepairs = 0;
+    let columnSwapSuspects = 0;
+    let missingRepairIds = 0;
+    let missingAssetIds = 0;
+
+    for (let i = 1; i < repairsData.length; i++) {
+      const row = repairsData[i];
+      const rowNum = i + 1;
+
+      const repairId = String(row[REPAIR_COLUMNS.REPAIR_ID] || '').trim();
+      const assetId = String(row[REPAIR_COLUMNS.ASSET_ID] || '').trim();
+      const assetName = String(row[REPAIR_COLUMNS.ASSET_NAME] || '').trim();
+
+      // Check for missing repair ID
+      if (!repairId) {
+        issues.push('Row ' + rowNum + ': Missing REPAIR_ID');
+        missingRepairIds++;
+      }
+
+      // Check for missing asset ID
+      if (!assetId) {
+        issues.push('Row ' + rowNum + ': Missing ASSET_ID');
+        missingAssetIds++;
+      }
+
+      // Check for orphaned repairs (asset doesn't exist)
+      if (assetId && !validAssetIds.has(assetId)) {
+        issues.push('Row ' + rowNum + ': Asset ID "' + assetId + '" not found in Assets sheet');
+        orphanedRepairs++;
+      }
+
+      // Check for column swap issues (repair ID looks like an asset ID/name)
+      if (repairId && validAssetIds.has(repairId)) {
+        issues.push('Row ' + rowNum + ': REPAIR_ID "' + repairId + '" looks like an ASSET_ID - possible column swap');
+        columnSwapSuspects++;
+      }
+
+      // Check if asset name is in repair ID column (another swap indicator)
+      if (repairId && !repairId.match(/^REP|^SHOP|^FIELD|^NORTH|^SCHED/i) && repairId.length > 20) {
+        issues.push('Row ' + rowNum + ': REPAIR_ID "' + repairId.substring(0, 30) + '..." does not match expected format');
+        columnSwapSuspects++;
+      }
+
+      // Check for numeric issues
+      const partCost = row[REPAIR_COLUMNS.PART_COST];
+      const laborHours = row[REPAIR_COLUMNS.LABOR_HOURS];
+      const totalCost = row[REPAIR_COLUMNS.TOTAL_COST];
+
+      if (partCost && isNaN(parseFloat(partCost))) {
+        issues.push('Row ' + rowNum + ': PART_COST "' + partCost + '" is not a valid number');
+      }
+
+      if (laborHours && isNaN(parseFloat(laborHours))) {
+        issues.push('Row ' + rowNum + ': LABOR_HOURS "' + laborHours + '" is not a valid number');
+      }
+
+      if (totalCost && isNaN(parseFloat(totalCost))) {
+        issues.push('Row ' + rowNum + ': TOTAL_COST "' + totalCost + '" is not a valid number');
+      }
+    }
+
+    // Summary
+    const summary = {
+      totalRepairs: repairsData.length - 1,
+      totalAssets: assetsData.length - 1,
+      issuesFound: issues.length,
+      orphanedRepairs: orphanedRepairs,
+      columnSwapSuspects: columnSwapSuspects,
+      missingRepairIds: missingRepairIds,
+      missingAssetIds: missingAssetIds
+    };
+
+    console.log('=== REPAIR DATA VALIDATION REPORT ===');
+    console.log('Total Repairs: ' + summary.totalRepairs);
+    console.log('Total Assets: ' + summary.totalAssets);
+    console.log('Issues Found: ' + summary.issuesFound);
+    console.log('  - Orphaned Repairs: ' + summary.orphanedRepairs);
+    console.log('  - Column Swap Suspects: ' + summary.columnSwapSuspects);
+    console.log('  - Missing Repair IDs: ' + summary.missingRepairIds);
+    console.log('  - Missing Asset IDs: ' + summary.missingAssetIds);
+
+    if (issues.length > 0) {
+      console.log('\nDetailed Issues (first 20):');
+      issues.slice(0, 20).forEach(function(issue) {
+        console.log('  ' + issue);
+      });
+      if (issues.length > 20) {
+        console.log('  ... and ' + (issues.length - 20) + ' more issues');
+      }
+    }
+
+    return {
+      success: true,
+      summary: summary,
+      issues: issues
+    };
+
+  } catch (error) {
+    console.error('Error validating repairs data:', error);
+    return {
+      success: false,
+      message: error.toString(),
+      issues: []
+    };
+  }
+}
+
+// ============================================
 // DEBUG FUNCTIONS
 // ============================================
 
